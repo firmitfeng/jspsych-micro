@@ -1,0 +1,5 @@
+*.bak
+*.swp
+*.zip
+.vscode
+.DS_Store

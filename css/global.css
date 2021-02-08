@@ -1,0 +1,128 @@
+html,
+body,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+img,
+ul,
+ol,
+li,
+dd,
+dt,
+dl,
+table {
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 14px;
+}
+
+h1{
+    font-size: 2.5em;
+}
+h2{
+    font-size: 1.8em;
+}
+h3{
+    font-size: 1.2em;
+}
+
+.exp-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#debug {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 5px;
+    background-color: black;
+    color: white;
+    width: 350px;
+    max-height: 350px;
+    overflow-y: scroll;
+    z-index: 999;
+}
+
+#exp {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    overflow: hidden;
+    /* border: 1px solid #000; */
+}
+
+#exp .exp-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+
+#exp .exp-item {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+#exp .circle {
+    border-radius: 50%;
+}
+
+#exp .instr{
+    padding:10px;
+    font-size: 30px;
+    text-align: center;
+}
+
+#exp .stumili{
+    padding:10px;
+    font-size: 21px;
+    text-align: center;
+}
+
+#exp .face{
+    width: 200px;
+    height: 250px;
+    object-fit: none;
+    object-position: 0 0;
+}
+
+#exp .face1 { object-position: 0 0; }
+#exp .face2 { object-position: 0 -250px; }
+#exp .face3 { object-position: 0 -500px; }
+#exp .face4 { object-position: 0 -750px; }
+#exp .face5 { object-position: 0 -1000px; }
+#exp .face6 { object-position: 0 -1250px; }
+#exp .face7 { object-position: 0 -1500px; }
+#exp .face8 { object-position: 0 -1750px; }
+#exp .face9 { object-position: 0 -2000px; }
+#exp .face10 { object-position: 0 -2250px; }
+
+
+.flex-box {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
