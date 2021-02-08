@@ -8,7 +8,7 @@
 
 这个版本是使用js+html+css，参考过 大师 写的js库，但是没有使用canvas，算是一个劣化版本吧。
 
-*注意：因为js的问题，所以时间精度有误差。*
+*注意：因为js的问题，所以[时间精度有误差](https://developer.mozilla.org/zh-cn/docs/Web/API/Window/setTimeout#%E5%A4%87%E6%B3%A8)。*
 
 Demo 见 [demo.html](https://firmitfeng.github.io/jspsych-micro/demo.html) 文件
 
