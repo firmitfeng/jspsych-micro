@@ -152,6 +152,33 @@ var jspsych = {
 
     },
 
+    waitClick: function (objs = []) {
+        logger.log = (`wait click`);
+        let ts = performance.now();
+        if (objs.length === 0) {
+            return new Promise(resolve => {
+                document.addEventListener(
+                    'click',
+                    (ev) => {
+                        resolve({ e: ev, s: ts, dur: (performance.now() - ts) });
+                    })//,
+                    //{ once: true });
+            });
+        } else {
+            var promiseAll = objs.map(function (obj, idx) {
+                return new Promise(function (resolve, reject) {
+                    obj.addEventListener(
+                        'click',
+                        (ev) => {
+                            resolve({ e: ev, s: ts, dur: (performance.now() - ts), idx: idx });
+                        },
+                        { once: true });
+                });
+            });
+            return Promise.race(promiseAll);
+        }
+    },
+
     waitKBMiSec: function (ms = 0) {
         logger.log = (`wait key press and ${ms} ms`);
         let ms_p = this.waitMiSec(ms);
@@ -326,8 +353,8 @@ var jspsych = {
         htmlObj.classList.add("exp-item");
         // htmlObj.style.position = 'relative';
 
-        htmlObj.style.top = x + 'px';
-        htmlObj.style.left = y + 'px';
+        htmlObj.style.left = x + 'px';
+        htmlObj.style.top = y + 'px';
 
         if (w != -1) {
             htmlObj.style.width = w + 'px';

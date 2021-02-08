@@ -15,7 +15,7 @@
     </div>
     <div id="mask" class="hidden"></div>
     <script src="js/utils.js"></script>
-    <script src="js/jspsy-micro.js"></script>
+    <script src="js/jspsy-micro-v-debug.js"></script>
 
     <script type="text/javascript">
 
@@ -25,7 +25,7 @@
             jspsych.fillText({ x: 100, y: 100 });
             await jspsych.flip();
             s = await jspsych.waitMiSec(1000);
-            console.log(performance.now() - s);
+            console.log(s);
             await jspsych.render();
             await jspsych.waitMiSec(1000);
             jspsych.cleanScreen();
@@ -37,37 +37,49 @@
             await jspsych.waitMiSec(1000);
             jspsych.fillCircle();
             jspsych.putObjToCenter(jspsych.lastDOM);
-            // let circle = jspsych.fillCircle();
-            // jspsych.putObjToCenter(circle);
             jspsych.fillRectangle({ x: 200, y: 200 });
-            jspsych.fillRectangle({ x: 200, y: 525 });
-            kb = await jspsych.waitKB();
-            console.log(kb);
-            s, result = await jspsych.waitKBSecs(2000);
-            console.log(result, isNaN(result));
+            jspsych.fillRectangle({ x: 525, y: 200 });
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             await jspsych.flip();
             await jspsych.render();
+            kb = await jspsych.waitKB();
+            console.log(kb);
+            s = await jspsych.waitKBMiSec(2000);
+            console.log(s);
             s = await jspsych.waitMiSec(1000);
-            console.log(performance.now() - s, s);
-            ///////////////////////////////////////////////////////            
-            jspsych.fillText({ content: 'this is secend line', x: 100, y: 100 });
+            console.log(s);
+            ///////////////////////////////////////////////////////////////////
+            jspsych.fillText({ content: 'this is secend line <br> wait 2000ms', x: 100, y: 100, w: 200, h:20 });
             await jspsych.flip();
             await jspsych.render();
             logger.log = ('render 2nd line');
+            jspsych.putObjToCenter(jspsych.lastDOM);
+            logger.log = ('put 2nd line');
             s = await jspsych.waitMiSec(1000);
-            console.log(performance.now() - s, s);
+            console.log(s);
             await jspsych.flip();
             await jspsych.render();
             logger.log = ('render blank screen');
             await jspsych.waitMiSec(1000);
-            jspsych.fillText({ content: 'this is 3rd line', x: 100, y: 100 });
+            jspsych.fillText({ content: 'this is 3rd line <br> click to continue...', x: 100, y: 100 });
             await jspsych.flip();
             await jspsych.render();
             logger.log = ('render 3rd line');
-            await jspsych.waitMiSec(1000);
+            s = await jspsych.waitClick();
+            console.log(s);
             jspsych.cleanScreen();
+            ///////////////////////////////////////////////////////////////////
+            let line_arr = [];
+            for(let i=0;i<6;i++){
+                line_arr.push(jspsych.fillText({ content: `${i+1} this is a sentence.`, x: 100, y: 50+i*50, w: 600, h: 50, class_:['center-box'] }));
+            }
+            jspsych.fillText({ content: ' click to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
+            await jspsych.flip();
+            await jspsych.render();
+            s = await jspsych.waitClick(line_arr);
+            console.log(s);
+            ///////////////////////////////////////////////////////////////////
             let cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            jspsych.putObjToCenter(cross);
             await jspsych.waitMiSec(1000);
             await jspsych.flip();
             await jspsych.render();
@@ -86,3 +98,4 @@
 </body>
 
 </html>
+
