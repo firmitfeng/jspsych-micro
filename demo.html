@@ -18,79 +18,70 @@
     <script src="js/jspsy-micro.js"></script>
 
     <script type="text/javascript">
-        let _default = {
-            bgColor: 'rgb(200,200,200)',
-            elemID: 'exp',
-            elemStyle: {
-                width: '800px',
-                height: '600px',
-                border: '1px solid #000',
-            },
-            debug: true,
-        };
+
         (async function () {
             var s, kb, result;
-            jspsycho.init();
-            jspsycho.fillText({ x: 100, y: 100 });
-            await jspsycho.flip();
-            s = await jspsycho.waitMiSec(1000);
+            jspsych.init();
+            jspsych.fillText({ x: 100, y: 100 });
+            await jspsych.flip();
+            s = await jspsych.waitMiSec(1000);
             console.log(performance.now() - s);
-            await jspsycho.render();
-            await jspsycho.waitMiSec(1000);
-            jspsycho.cleanScreen();
-            // jspsycho.render();
-            jspsycho.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200, w: 50, h: 50 });
-            jspsycho.putObjToCenter(jspsycho.lastDOM);
-            await jspsycho.flip();
-            await jspsycho.render();
-            await jspsycho.waitMiSec(1000);
-            jspsycho.fillCircle();
-            jspsycho.putObjToCenter(jspsycho.lastDOM);
-            // let circle = jspsycho.fillCircle();
-            // jspsycho.putObjToCenter(circle);
-            jspsycho.fillRectangle({ x: 200, y: 200 });
-            jspsycho.fillRectangle({ x: 200, y: 525 });
-            kb = await jspsycho.waitKB();
+            await jspsych.render();
+            await jspsych.waitMiSec(1000);
+            jspsych.cleanScreen();
+            // jspsych.render();
+            jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200, w: 50, h: 50 });
+            jspsych.putObjToCenter(jspsych.lastDOM);
+            await jspsych.flip();
+            await jspsych.render();
+            await jspsych.waitMiSec(1000);
+            jspsych.fillCircle();
+            jspsych.putObjToCenter(jspsych.lastDOM);
+            // let circle = jspsych.fillCircle();
+            // jspsych.putObjToCenter(circle);
+            jspsych.fillRectangle({ x: 200, y: 200 });
+            jspsych.fillRectangle({ x: 200, y: 525 });
+            kb = await jspsych.waitKB();
             console.log(kb);
-            s, result = await jspsycho.waitKBSecs(2000);
+            s, result = await jspsych.waitKBSecs(2000);
             console.log(result, isNaN(result));
-            await jspsycho.flip();
-            await jspsycho.render();
-            s = await jspsycho.waitMiSec(1000);
+            await jspsych.flip();
+            await jspsych.render();
+            s = await jspsych.waitMiSec(1000);
             console.log(performance.now() - s, s);
             ///////////////////////////////////////////////////////            
-            jspsycho.fillText({ content: 'this is secend line', x: 100, y: 100 });
-            await jspsycho.flip();
-            await jspsycho.render();
+            jspsych.fillText({ content: 'this is secend line', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
             logger.log = ('render 2nd line');
-            s = await jspsycho.waitMiSec(1000);
+            s = await jspsych.waitMiSec(1000);
             console.log(performance.now() - s, s);
-            await jspsycho.flip();
-            await jspsycho.render();
+            await jspsych.flip();
+            await jspsych.render();
             logger.log = ('render blank screen');
-            await jspsycho.waitMiSec(1000);
-            jspsycho.fillText({ content: 'this is 3rd line', x: 100, y: 100 });
-            await jspsycho.flip();
-            await jspsycho.render();
+            await jspsych.waitMiSec(1000);
+            jspsych.fillText({ content: 'this is 3rd line', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
             logger.log = ('render 3rd line');
-            await jspsycho.waitMiSec(1000);
-            jspsycho.cleanScreen();
-            let cross = jspsycho.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            jspsycho.putObjToCenter(cross);
-            await jspsycho.waitMiSec(1000);
-            await jspsycho.flip();
-            await jspsycho.render();
-            await jspsycho.waitMiSec(1000);
-            let r_cross = jspsycho.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            await jspsycho.flip();
+            await jspsych.waitMiSec(1000);
+            jspsych.cleanScreen();
+            let cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
+            jspsych.putObjToCenter(cross);
+            await jspsych.waitMiSec(1000);
+            await jspsych.flip();
+            await jspsych.render();
+            await jspsych.waitMiSec(1000);
+            let r_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
+            await jspsych.flip();
             for (let i = 0; i < 90; i++) {
-                jspsycho.rotateObj(r_cross, i + 1);
+                jspsych.rotateObj(r_cross, i + 1);
 
-                await jspsycho.render();
-                // await jspsycho.waitMiSec(50);
+                await jspsych.render();
+                // await jspsych.waitMiSec(50);
             }
         })();
-        // window.requestAnimationFrame(jspsycho.render);
+        // window.requestAnimationFrame(jspsych.render);
     </script>
 </body>
 
