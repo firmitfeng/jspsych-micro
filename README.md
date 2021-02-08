@@ -6,6 +6,6 @@
 
 *注意：因为js的问题，所以时间精度有误差。*
 
-Demo 见 demo.html 文件
+Demo 见 [demo.html](https://firmitfeng.github.io/jspsych-micro/demo.html) 文件
 
 A mini js lib for experiment of psychology. 
