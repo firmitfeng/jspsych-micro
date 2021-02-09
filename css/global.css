@@ -19,7 +19,7 @@ dl,
 table {
     margin: 0;
     padding: 0;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: "Arial", 'Microsoft Yahei',"Lucida Grande", "Tahoma","Helvetica", "sans-serif", 微软雅黑,黑体;
     font-size: 14px;
 }
 
@@ -100,24 +100,35 @@ h3{
     text-align: center;
 }
 
-#exp .face{
+#exp .num{
     width: 200px;
     height: 250px;
     object-fit: none;
     object-position: 0 0;
 }
 
-#exp .face1 { object-position: 0 0; }
-#exp .face2 { object-position: 0 -250px; }
-#exp .face3 { object-position: 0 -500px; }
-#exp .face4 { object-position: 0 -750px; }
-#exp .face5 { object-position: 0 -1000px; }
-#exp .face6 { object-position: 0 -1250px; }
-#exp .face7 { object-position: 0 -1500px; }
-#exp .face8 { object-position: 0 -1750px; }
-#exp .face9 { object-position: 0 -2000px; }
-#exp .face10 { object-position: 0 -2250px; }
+#exp .num0 { object-position: 0 0; }
+#exp .num1 { object-position: 0 -250px; }
+#exp .num2 { object-position: 0 -500px; }
+#exp .num3 { object-position: 0 -750px; }
+#exp .num4 { object-position: 0 -1000px; }
+#exp .num5 { object-position: 0 -1250px; }
+#exp .num6 { object-position: 0 -1500px; }
+#exp .num7 { object-position: 0 -1750px; }
+#exp .num8 { object-position: 0 -2000px; }
+#exp .num9 { object-position: 0 -2250px; }
 
+#exp .pointer{
+    cursor: pointer;
+}
+
+.hidden{
+    display: none;
+}
+
+.center-box{
+    text-align: center;
+}
 
 .flex-box {
     height: 100%;

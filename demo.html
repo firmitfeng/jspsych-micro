@@ -15,7 +15,7 @@
     </div>
     <div id="mask" class="hidden"></div>
     <script src="js/utils.js"></script>
-    <script src="js/jspsy-micro-v-debug.js"></script>
+    <script src="js/jspsy-micro.js"></script>
 
     <script type="text/javascript">
 
@@ -71,7 +71,7 @@
             ///////////////////////////////////////////////////////////////////
             let line_arr = [];
             for(let i=0;i<6;i++){
-                line_arr.push(jspsych.fillText({ content: `${i+1} this is a sentence.`, x: 100, y: 50+i*50, w: 600, h: 50, class_:['center-box'] }));
+                line_arr.push(jspsych.fillText({ content: `${i+1} this is a sentence.`, x: 100, y: 50+i*50, w: 600, h: 20, class_:['center-box', 'pointer'] }));
             }
             jspsych.fillText({ content: ' click to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             await jspsych.flip();

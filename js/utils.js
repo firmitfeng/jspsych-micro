@@ -82,18 +82,16 @@ function fullScreen() {
 		}
 	}
 }
+
 function exitFullScreen() {
-	var el = document;
-	var cfs = el.cancelFullScreen || el.webkitCancelFullScreen ||
-		el.mozCancelFullScreen || el.exitFullScreen;
-	if (typeof cfs != "undefined" && cfs) {
-		cfs.call(el);
-	} else if (typeof window.ActiveXObject != "undefined") {
-		//for IE，这里和fullScreen相同，模拟按下F11键退出全屏
-		var wscript = new ActiveXObject("WScript.Shell");
-		if (wscript != null) {
-			wscript.SendKeys("{F11}");
-		}
+	if (document.exitFullscreen) {
+		document.exitFullscreen();
+	} else if (document.msExitFullscreen) {
+		document.msExitFullscreen();
+	} else if (document.mozCancelFullScreen) {
+		document.mozCancelFullScreen();
+	} else if (document.webkitExitFullscreen) {
+		document.webkitExitFullscreen();
 	}
 }
 
@@ -119,6 +117,7 @@ function RandomChoice(arr_len,n){
     }
     let result = [];
     let temp_arr = Array.from({ length: arr_len }, (v, i) => i);
+	temp_arr.shuffle();
     let rnd_idx;
     for (let i = 0; i < n; i++) {
         rnd_idx = Math.floor(Math.random() * temp_arr.length);
