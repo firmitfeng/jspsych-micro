@@ -132,8 +132,8 @@ var jspsych = {
         logger.log = (`wait ${ms} ms`);
         // let ts = performance.now();
         return new Promise(resolve => {
-            setTimeout((ts)=>{
-                resolve({e: false, s: ts, dur: (performance.now()-ts)});
+            setTimeout((ts) => {
+                resolve({ e: false, s: ts, dur: (performance.now() - ts) });
             }, ms, performance.now()); //performance.now() 返回的是 setTimeout 开始运行的时间
         });
     },
@@ -144,25 +144,25 @@ var jspsych = {
         return new Promise(resolve => {
             window.addEventListener(
                 'keypress',
-                (ev)=>{
-                    resolve({e: ev, s: ts, dur: (performance.now()-ts)});
-                },                
-                { once: true }); 
+                (ev) => {
+                    resolve({ e: ev, s: ts, dur: (performance.now() - ts) });
+                },
+                { once: true });
         });
 
     },
 
     waitClick: function (objs = []) {
         logger.log = (`wait click`);
-        let ts = performance.now();
-        if (objs.length === 0) {
+        if (!objs) {
+            let ts = performance.now();
             return new Promise(resolve => {
                 document.addEventListener(
                     'click',
                     (ev) => {
                         resolve({ e: ev, s: ts, dur: (performance.now() - ts) });
-                    })//,
-                    //{ once: true });
+                    },
+                    { once: true });
             });
         } else {
             var promiseAll = objs.map(function (obj, idx) {
@@ -186,7 +186,7 @@ var jspsych = {
         return Promise.race([ms_p, kb_p])
     },
 
-    waitKBSecsA: function (ms = 0) {
+    waitKBMiSecsA: function (ms = 0) {
         logger.log = (`wait key press and ${ms} ms`);
         let ms_p = this.waitMiSec(ms);
         let kb_p = this.waitKB()
@@ -229,23 +229,23 @@ var jspsych = {
         });
     },
 
-    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_=[] } = {}) {
+    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_ = [] } = {}) {
         let textObj = this.createDOMObj(wrapper, x, y, w, h, styles);
         this.expItemDOMs.push(textObj);
         textObj.innerHTML = content;
-        for(let cl of class_){
+        for (let cl of class_) {
             textObj.classList.add(cl);
         }
         this.addItemToDOM(textObj);
         return textObj;
     },
 
-    fillImg: function ({ url = '', x = 0, y = 0, w = -1, h = -1, alt = 'image', styles = {}, class_=[] } = {}) {
+    fillImg: function ({ url = '', x = 0, y = 0, w = -1, h = -1, alt = 'image', styles = {}, class_ = [] } = {}) {
         let imgObj = this.createDOMObj('img', x, y, w, h, styles);
         imgObj.alt = alt;
         this.expItemDOMs.push(imgObj);
         imgObj.src = url;
-        for(let cl of class_){
+        for (let cl of class_) {
             imgObj.classList.add(cl);
         }
         this.addItemToDOM(imgObj);
@@ -370,17 +370,41 @@ var jspsych = {
 };
 
 
-// 判断按键是否符合 计时
-async function waitPressKeyAndMs(ms=0, key_codes=[]){
+// 判断是否按键并延迟设定的时间
+async function waitKBAndDelayMs(ms = 0, key_codes = ['Space', 'Enter']) {
     let ts = performance.now();
     let dur = 0;
     let kb = await jspsych.waitKBMiSec(ms);
-    while(kb.e && !key_codes.includes(kb.e.code) && (dur += kb.dur)<ms){
-        kb = await jspsych.waitKBMiSec(ms-dur);
-    }
     dur += kb.dur;
-    if(kb.e && !key_codes.includes(kb.e.code)){
+    if (dur < ms) {
+        await jspsych.waitMiSec(ms - dur);
+    }
+    if (kb.e && !key_codes.includes(kb.e.code)) {
         kb.e = false;
     }
-    return [kb.e, dur];
+    return { e: kb.e, s: ts, dur: dur }
 }
+
+
+// 判断在给定时间内是否按键、是否符合给定组合，
+async function waitKBAndMs(ms = 0, key_codes = ['Space', 'Enter']) {
+    let ts = performance.now();
+    let dur = 1;
+    let kb = await jspsych.waitKBMiSec(ms);
+    while (kb.e && !key_codes.includes(kb.e.code) && (dur += kb.dur) < ms) {
+        kb = await jspsych.waitKBMiSec(ms - dur);
+    }
+    if (kb.e && !key_codes.includes(kb.e.code)) {
+        kb.e = false;
+    }
+    return { e: kb.e, s: ts, dur: performance.now()-ts }
+}
+
+
+///////////////////////////////////////////////////////////////
+// 判断按键是否符合
+// kb = await jspsych.waitKB();
+// while (!['Space', 'KeyF'].includes(kb.e.code)) {
+//     console.log(kb);
+//     kb = await jspsych.waitKB();
+// }
