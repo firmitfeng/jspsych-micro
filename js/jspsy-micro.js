@@ -152,10 +152,10 @@ var jspsych = {
 
     },
 
-    waitClick: function (objs = []) {
+    waitClick: function (objs = false) {
         logger.log = (`wait click`);
+        let ts = performance.now();
         if (!objs) {
-            let ts = performance.now();
             return new Promise(resolve => {
                 document.addEventListener(
                     'click',
