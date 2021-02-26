@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/plugs.css">
     <title>DEMO- Experiment</title>
 </head>
 
@@ -21,20 +22,68 @@
 
         (async function () {
             var s, kb, result;
-            jspsych.init();
-            jspsych.fillText({ x: 100, y: 100 });
+
+            ///////////////////////////////////////////////////////////////////////
+            // 初始化实验数据
+            ///////////////////////////////////////////////////////////////////////
+
+            jspsych.init(debug_cfg);
+            jspsych.fillText({ content: '加载中，请稍后....' });
             await jspsych.flip();
-            s = await jspsych.waitMiSec(1000);
-            console.log(s);
             await jspsych.render();
-            await jspsych.waitMiSec(1000);
-            jspsych.cleanScreen();
-            // jspsych.render();
+            jspsych.putObjToCenter(jspsych.lastDOM);    // 将文字放置屏幕正中
+
+
+            ///////////////////////////////////////////////////////////////////////
+            // DEMO开始
+            ///////////////////////////////////////////////////////////////////////
+
+            // 显示文字
+            jspsych.fillText({content:'<h1>DEMO</h1><p>开始演示:</p><p>显示文字并按任意键继续</p>', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
+            kb = await jspsych.waitKB();    // 等待按键
+            logger.log = `press: ${kb.e.code}, during: ${kb.dur} ms`;
+            console.log(kb);
+
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示文字并等待2秒钟</p>', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
+            await jspsych.waitMiSec(2000);  // 等待2000ms
+
+            // 显示图片
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片并等待2秒钟</p>', x: 100, y: 100 });
             jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200, w: 50, h: 50 });
             jspsych.putObjToCenter(jspsych.lastDOM);
             await jspsych.flip();
             await jspsych.render();
-            await jspsych.waitMiSec(1000);
+            await jspsych.waitMiSec(2000);
+
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片旋转</p>', x: 100, y: 100 });
+            let r_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
+            await jspsych.flip();
+            await jspsych.render();
+            for (let i = 0; i < 90; i++) {
+                jspsych.rotateObj(r_cross, i + 1);
+                await jspsych.render();
+            }
+            await jspsych.waitKB(); 
+            
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片运动</p>', x: 100, y: 100 });
+            let m_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
+            await jspsych.flip();
+            await jspsych.render();
+            for (let i = 0; i < 100; i++) {
+                // m_cross.style.left = 300 + i + 'px';
+                jspsych.moveObj(m_cross, {x:300+i})
+                await jspsych.render();
+            }
+            await jspsych.waitKB(); 
+
+            // CSS 图形
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示 CSS 图形</p>', x: 100, y: 100 });
             jspsych.fillCircle();
             jspsych.putObjToCenter(jspsych.lastDOM);
             jspsych.fillRectangle({ x: 200, y: 200 });
@@ -44,54 +93,51 @@
             await jspsych.render();
             kb = await jspsych.waitKB();
             console.log(kb);
-            s = await jspsych.waitKBMiSec(2000);
-            console.log(s);
-            s = await jspsych.waitMiSec(1000);
-            console.log(s);
-            ///////////////////////////////////////////////////////////////////
-            jspsych.fillText({ content: 'this is secend line <br> wait 2000ms', x: 100, y: 100, w: 200, h:20 });
+
+            // 计时相关
+            jspsych.fillText({content:'<h1>DEMO</h1><p>等待按键或2秒后继续</p>', x: 100, y: 100 });
             await jspsych.flip();
             await jspsych.render();
-            logger.log = ('render 2nd line');
-            jspsych.putObjToCenter(jspsych.lastDOM);
-            logger.log = ('put 2nd line');
-            s = await jspsych.waitMiSec(1000);
-            console.log(s);
+            kb = await jspsych.waitKBMiSec(2000);
+            logger.log = `press: ${kb.e?kb.e.code:'None'}, during: ${kb.dur} ms`;
+            console.log(kb);
+
+            // click
+            jspsych.fillText({content:'<h1>DEMO</h1><p>鼠标点击后继续</p>', x: 100, y: 100 });
             await jspsych.flip();
             await jspsych.render();
-            logger.log = ('render blank screen');
-            await jspsych.waitMiSec(1000);
-            jspsych.fillText({ content: 'this is 3rd line <br> click to continue...', x: 100, y: 100 });
-            await jspsych.flip();
-            await jspsych.render();
-            logger.log = ('render 3rd line');
             s = await jspsych.waitClick();
+            logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
             console.log(s);
-            jspsych.cleanScreen();
-            ///////////////////////////////////////////////////////////////////
+
+            jspsych.fillText({content:'<h1>DEMO</h1><p>鼠标点击不同选项</p>', x: 100, y: 100 });
+            jspsych.fillText({ content: ' click to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             let line_arr = [];
             for(let i=0;i<6;i++){
-                line_arr.push(jspsych.fillText({ content: `${i+1} this is a sentence.`, x: 100, y: 50+i*50, w: 600, h: 20, class_:['center-box', 'pointer'] }));
+                line_arr.push(jspsych.fillText({ content: `${i+1} this is a sentence.`, x: 100, y: 200+i*30, w: 600, h: 20, class_:['center-box', 'pointer'] }));
             }
-            jspsych.fillText({ content: ' click to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick(line_arr);
+            logger.log = `mouse: ${s.e.which}, clicked idx: ${s.idx}, during: ${s.dur} ms`;
             console.log(s);
-            ///////////////////////////////////////////////////////////////////
-            let cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            await jspsych.waitMiSec(1000);
+
+            // 显示按钮、滑动条、输入框
+            jspsych.fillText({content:'<h1>DEMO</h1><p>显示按钮、滑动条、输入框</p>', x: 100, y: 100 });
+            jspsych.fillText({ content: '点击按钮继续', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
+            jspsych.fillInput({x: 100, y: 200, w: 600, h: 20});
+            jspsych.fillRange({x: 100, y: 250, w: 600, h: 20});
+            let btn = jspsych.fillButton({text:'按钮', x: 100, y: 300, w: 100, h: 30});
             await jspsych.flip();
             await jspsych.render();
-            await jspsych.waitMiSec(1000);
-            let r_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            await jspsych.flip();
-            for (let i = 0; i < 90; i++) {
-                jspsych.rotateObj(r_cross, i + 1);
+            s = await jspsych.waitClick([btn]);
+            logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
+            console.log(s);
 
-                await jspsych.render();
-                // await jspsych.waitMiSec(50);
-            }
+            jspsych.fillText({content:'<h1>DEMO 结束</h1>', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
+
         })();
         // window.requestAnimationFrame(jspsych.render);
     </script>

@@ -1,4 +1,4 @@
-var _default = {
+var debug_cfg = {
     bgColor: 'rgb(200,200,200)',
     elemID: 'exp',
     elemStyle: {
@@ -6,9 +6,9 @@ var _default = {
         height: '600px',
         border: '1px solid #000',
     },
+    loglv: 0,   // LogLevel.none,
     debug: true,
 };
-
 
 let debuger = {
     init: function () {
@@ -29,6 +29,7 @@ let debuger = {
 }
 
 const LogLevel = {
+    none: 0,
     console: 0x1,
     file: 0x2,
     div: 0x4,
@@ -82,15 +83,16 @@ var logger = {
 
 
 var jspsych = {
-    expRootElem: {},
-    expElems: [],
-    showIdx: 0,
-    hideIdx: 1,
-    expItemDOMs: [],
-    hasChange: false,
+    expRootElem: {},    // 实验的根容器
+    expElems: [],       // 存放实验内容的容器，有两个，一个保存准备的内容，一个是当前显示的内容
+    showIdx: 0,         // 当前显示的实验内容所在容器（expElems）的索引值
+    hideIdx: 1,         // 当前隐藏的实验内容所在容器（expElems）的索引值
+    expItemDOMs: [],    // 实际的实验的内容
+    hasChange: false,   // 容器内容是否有变化，用来判断是否需要重新绘图
 
     kb_press: false,
 
+    // 返回最后添加的实验条目
     get lastDOM() {
         if (this.expItemDOMs.length > 0) {
             return this.expItemDOMs[this.expItemDOMs.length - 1];
@@ -102,8 +104,8 @@ var jspsych = {
     init: function ({ bgColor = 'rgb(200,200,200)',
         elemID = 'exp',
         elemStyle = { width: '800px', height: '600px', border: '1px solid #000', },
-        loglv = 0,
-        debug = true, } = {}) {
+        loglv = LogLevel.none,
+        debug = false, } = {}) {
 
         if (debug) {
             loglv = loglv | LogLevel.div;
@@ -205,7 +207,7 @@ var jspsych = {
                 if (cls) {
                     self.cleanScreen(self.hideIdx);
                 }
-                logger.log = (`flip to ${self.showIdx}`);
+                // logger.log = (`flip to ${self.showIdx}`);
                 self.hasChange = true;
                 resolve();
             }, 0);
@@ -217,7 +219,7 @@ var jspsych = {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (self.hasChange) {
-                    logger.log = (`render screen ${self.showIdx}`);
+                    // logger.log = (`render screen ${self.showIdx}`);
                     self.expElems[self.hideIdx].style.display = 'none';
                     self.expElems[self.showIdx].style.display = 'block';
                     self.hasChange = false;
@@ -250,6 +252,37 @@ var jspsych = {
         }
         this.addItemToDOM(imgObj);
         return imgObj;
+    },
+
+    fillButton: function ({ text = '按钮', x = 0, y = 0, w = 100, h = 50, styles = {}, class_ = [] } = {}) {
+        let btnObj = this.createDOMObj('button', x, y, w, h, styles);
+        btnObj.innerText = text;
+        this.expItemDOMs.push(btnObj);
+        for (let cl of class_) {
+            btnObj.classList.add(cl);
+        }
+        this.addItemToDOM(btnObj);
+        return btnObj;
+    },
+
+    fillInput: function ({ tp = 'text', x = 0, y = 0, w = 100, h = 20, attrs = {}, styles = {}, class_ = [] } = {}) {
+        let inputObj = this.createDOMObj('input', x, y, w, h, styles);
+        inputObj.type = tp;
+        for (let k in attrs) {
+            inputObj[k] = attrs[k];
+        }
+        this.expItemDOMs.push(inputObj);
+        for (let cl of class_) {
+            inputObj.classList.add(cl);
+        }
+        this.addItemToDOM(inputObj);
+        return inputObj;
+    },
+
+    fillRange: function ({ val=5, min = 1, max = 9, step = 'any', x = 0, y = 0, w = 100, h = 20, styles = {}, class_ = [] } = {}) {
+        let attrs = { value:val, min: min, max: max, step: step };
+        let rangeObj = this.fillInput({ tp: 'range', x: x, y: y, w: w, h: h, attrs: attrs, styles: styles, class_: class_ });
+        return rangeObj;
     },
 
     fillCircle: function ({ x = 0, y = 0, w = 50, h = 50, bgColor = 'red', styles = {} } = {}) {
@@ -315,6 +348,15 @@ var jspsych = {
         this.hasChange = true;
     },
 
+    moveObj: function(obj, {x=false, y=false} = {}){
+        if(x!==false){
+            obj.style.left = x + 'px';
+        }
+        if(y!==false){
+            obj.style.top = y + 'px';
+        }
+    },
+
     //清空一个元素，即删除一个元素的所有子元素
     removeAllChild: function (obj) {
         //当div下还存在子节点时 循环继续
@@ -366,7 +408,8 @@ var jspsych = {
             htmlObj.style[k] = styles[k];
         }
         return htmlObj;
-    }
+    },
+
 };
 
 
@@ -397,7 +440,7 @@ async function waitKBAndMs(ms = 0, key_codes = ['Space', 'Enter']) {
     if (kb.e && !key_codes.includes(kb.e.code)) {
         kb.e = false;
     }
-    return { e: kb.e, s: ts, dur: performance.now()-ts }
+    return { e: kb.e, s: ts, dur: performance.now() - ts }
 }
 
 

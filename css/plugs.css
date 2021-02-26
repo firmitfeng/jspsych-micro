@@ -1,0 +1,18 @@
+#exp .num{
+    width: 200px;
+    height: 250px;
+    object-fit: none;
+    object-position: 0 0;
+}
+
+#exp .num0 { object-position: 0 0; }
+#exp .num1 { object-position: 0 -250px; }
+#exp .num2 { object-position: 0 -500px; }
+#exp .num3 { object-position: 0 -750px; }
+#exp .num4 { object-position: 0 -1000px; }
+#exp .num5 { object-position: 0 -1250px; }
+#exp .num6 { object-position: 0 -1500px; }
+#exp .num7 { object-position: 0 -1750px; }
+#exp .num8 { object-position: 0 -2000px; }
+#exp .num9 { object-position: 0 -2250px; }
+
