@@ -61,18 +61,17 @@
 
             jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片旋转</p>', x: 100, y: 100 });
             let r_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             await jspsych.flip();
             await jspsych.render();
             for (let i = 0; i < 90; i++) {
                 jspsych.rotateObj(r_cross, i + 1);
                 await jspsych.render();
             }
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
             await jspsych.waitKB(); 
             
             jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片运动</p>', x: 100, y: 100 });
             let m_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
-            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] });
             await jspsych.flip();
             await jspsych.render();
             for (let i = 0; i < 100; i++) {
@@ -80,6 +79,7 @@
                 jspsych.moveObj(m_cross, {x:300+i})
                 await jspsych.render();
             }
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
             await jspsych.waitKB(); 
 
             // CSS 图形

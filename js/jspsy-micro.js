@@ -198,7 +198,7 @@ var jspsych = {
     flip: function ({ ts = performance.now(), cls = true } = {}) {
         let self = this;
         return new Promise((resolve) => {
-            setTimeout(() => {
+            // setTimeout(() => {
                 [self.showIdx, self.hideIdx] = [self.hideIdx, self.showIdx];
                 // move hide and show to render 
                 // self.expElems[self.hideIdx].style.display = 'none';
@@ -210,35 +210,42 @@ var jspsych = {
                 // logger.log = (`flip to ${self.showIdx}`);
                 self.hasChange = true;
                 resolve();
-            }, 0);
+            // }, 0);
         });
     },
 
     render: function ({ ts = performance.now(), cls = true } = {}) {
         let self = this;
         return new Promise((resolve) => {
-            setTimeout(() => {
-                if (self.hasChange) {
-                    // logger.log = (`render screen ${self.showIdx}`);
-                    self.expElems[self.hideIdx].style.display = 'none';
-                    self.expElems[self.showIdx].style.display = 'block';
-                    self.hasChange = false;
+            // setTimeout(()=>{}, 0) 运行速度比 requestAnimationFrame 快
+            // setTimeout(() => {
+            //     if (self.hasChange) {
+            //         logger.log = (`render screen ${self.showIdx}`);
+            //         self.expElems[self.hideIdx].style.display = 'none';
+            //         self.expElems[self.showIdx].style.display = 'block';
+            //         self.hasChange = false;
+            //     }
+            //     resolve();
+            // }, 0);
 
-                    // window.requestAnimationFrame(jspsych.render);
-                }
-                resolve();
-            }, 0);
+            if (self.hasChange) {
+                // logger.log = (`render screen ${self.showIdx}`);
+                self.expElems[self.hideIdx].style.display = 'none';
+                self.expElems[self.showIdx].style.display = 'block';
+                self.hasChange = false;
+            }
+            window.requestAnimationFrame(resolve);
         });
     },
 
-    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_ = [] } = {}) {
+    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_ = [] } = {}, use_curr_elm=false) {
         let textObj = this.createDOMObj(wrapper, x, y, w, h, styles);
         this.expItemDOMs.push(textObj);
         textObj.innerHTML = content;
         for (let cl of class_) {
             textObj.classList.add(cl);
         }
-        this.addItemToDOM(textObj);
+        this.addItemToDOM(textObj, use_curr_elm);
         return textObj;
     },
 
@@ -355,6 +362,7 @@ var jspsych = {
         if(y!==false){
             obj.style.top = y + 'px';
         }
+        this.hasChange = true;
     },
 
     //清空一个元素，即删除一个元素的所有子元素
@@ -385,8 +393,12 @@ var jspsych = {
         this.hasChange = true;
     },
 
-    addItemToDOM: function (obj) {
-        this.expElems[this.hideIdx].appendChild(obj);
+    addItemToDOM: function (obj, use_curr_elm = false) {
+        if(!use_curr_elm){
+            this.expElems[this.hideIdx].appendChild(obj);
+        }else{
+            this.expElems[this.showIdx].appendChild(obj);
+        }
         this.hasChange = true;
     },
 
