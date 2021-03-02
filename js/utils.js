@@ -1,42 +1,42 @@
 
-function plImgCB (imgs, callback) {
-    var promiseAll = imgs.map(function (item, index) {
-        return new Promise(function (resolve, reject) {
-            var img = new Image();
-            img.onload = function () {
-                img.onload = null;
-                resolve(img);
-            };
-            img.error = function () {
-                reject('图片加载失败');
-            };
-            img.src = item;
-        });
-    });
-    // return Promise.all(promiseAll);
-    Promise.all(promiseAll).then(
-        callback,
-        function (err) {
-            console.log(err);
-        }
-    );
+function plImgCB(imgs, callback) {
+	var promiseAll = imgs.map(function (item, index) {
+		return new Promise(function (resolve, reject) {
+			var img = new Image();
+			img.onload = function () {
+				img.onload = null;
+				resolve(img);
+			};
+			img.error = function () {
+				reject('图片加载失败');
+			};
+			img.src = item;
+		});
+	});
+	// return Promise.all(promiseAll);
+	Promise.all(promiseAll).then(
+		callback,
+		function (err) {
+			console.log(err);
+		}
+	);
 }
 
-function plImgPr (imgs) {
-    var promiseAll = imgs.map(function (item, index) {
-        return new Promise(function (resolve, reject) {
-            var img = new Image();
-            img.onload = function () {
-                img.onload = null;
-                resolve('done');
-            };
-            img.error = function () {
-                reject(false);
-            };
-            img.src = item;
-        });
-    });
-    return Promise.all(promiseAll);
+function plImgPr(imgs) {
+	var promiseAll = imgs.map(function (item, index) {
+		return new Promise(function (resolve, reject) {
+			var img = new Image();
+			img.onload = function () {
+				img.onload = null;
+				resolve('done');
+			};
+			img.error = function () {
+				reject(false);
+			};
+			img.src = item;
+		});
+	});
+	return Promise.all(promiseAll);
 }
 
 // Fisher–Yates shuffle 
@@ -51,10 +51,28 @@ Array.prototype.shuffle = function () {
 	return input;
 }
 
+// 判断是否为数组
 if (!Array.isArray) {
 	Array.isArray = function (arg) {
 		return Object.prototype.toString.call(arg) === '[object Array]'
 	}
+}
+
+// 判断对象为空
+function isEmptyObject(e) {  
+    for (let t in e)  
+        return !1;
+    return !0;
+}  
+// var arr = []
+// arr[-1] = ''
+// isEmptyObject(arr);
+
+function isEmptyObj(e){
+	if (Object.keys(e).length === 0) {
+		return !false
+	}
+	return !true
 }
 
 Math.randomInt = function (i) {
@@ -64,8 +82,24 @@ Math.randomInt = function (i) {
 	return Math.floor(Math.random() * i);
 }
 
+function RandomChoice(arr_len, n) {
+	if (arr_len < n) {
+		return false;
+	}
+	let result = [];
+	let temp_arr = Array.from({ length: arr_len }, (v, i) => i);
+	temp_arr.shuffle();
+	let rnd_idx;
+	for (let i = 0; i < n; i++) {
+		rnd_idx = Math.floor(Math.random() * temp_arr.length);
+		result.push(temp_arr[rnd_idx]);
+		temp_arr.splice(rnd_idx, 1);
+	}
+	return result;
+}
+
 function destoryLocalStorage() {
-	//localStorage.clear();
+	localStorage.clear();
 };
 
 function fullScreen() {
@@ -111,18 +145,34 @@ function download(filename, text) {
 	}
 };
 
-function RandomChoice(arr_len,n){
-    if(arr_len<n){
-        return false;
-    }
-    let result = [];
-    let temp_arr = Array.from({ length: arr_len }, (v, i) => i);
-	temp_arr.shuffle();
-    let rnd_idx;
-    for (let i = 0; i < n; i++) {
-        rnd_idx = Math.floor(Math.random() * temp_arr.length);
-        result.push(temp_arr[rnd_idx]);
-        temp_arr.splice(rnd_idx, 1);
-    }
-    return result;
-}
+// 下面的例子则是利用get拦截，实现一个生成各种 DOM 节点的通用函数dom。
+// https://es6.ruanyifeng.com/#docs/proxy
+const dom = new Proxy({}, {
+	get(target, property) {
+		return function (attrs = {}, ...children) {
+			const el = document.createElement(property);
+			for (let prop of Object.keys(attrs)) {
+				el.setAttribute(prop, attrs[prop]);
+			}
+			for (let child of children) {
+				if (typeof child === 'string') {
+					child = document.createTextNode(child);
+				}
+				el.appendChild(child);
+			}
+			return el;
+		}
+	}
+});
+// 使用
+// const el = dom.div({},
+// 	'Hello, my name is ',
+// 	dom.a({ href: '//example.com' }, 'Mark'),
+// 	'. I like:',
+// 	dom.ul({},
+// 		dom.li({}, 'The web'),
+// 		dom.li({}, 'Food'),
+// 		dom.li({}, '…actually that\'s it')
+// 	)
+// );
+// document.body.appendChild(el);

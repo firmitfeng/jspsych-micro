@@ -43,7 +43,7 @@
             await jspsych.flip();
             await jspsych.render();
             kb = await jspsych.waitKB();    // 等待按键
-            logger.log = `press: ${kb.e.code}, during: ${kb.dur} ms`;
+            jspsych.logger.log = `press: ${kb.e.code}, during: ${kb.dur} ms`;
             console.log(kb);
 
             jspsych.fillText({content:'<h1>DEMO</h1><p>显示文字并等待2秒钟</p>', x: 100, y: 100 });
@@ -99,7 +99,7 @@
             await jspsych.flip();
             await jspsych.render();
             kb = await jspsych.waitKBMiSec(2000);
-            logger.log = `press: ${kb.e?kb.e.code:'None'}, during: ${kb.dur} ms`;
+            jspsych.logger.log = `press: ${kb.e?kb.e.code:'None'}, during: ${kb.dur} ms`;
             console.log(kb);
 
             // click
@@ -107,7 +107,7 @@
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick();
-            logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
+            jspsych.logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
             console.log(s);
 
             jspsych.fillText({content:'<h1>DEMO</h1><p>鼠标点击不同选项</p>', x: 100, y: 100 });
@@ -119,7 +119,7 @@
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick(line_arr);
-            logger.log = `mouse: ${s.e.which}, clicked idx: ${s.idx}, during: ${s.dur} ms`;
+            jspsych.logger.log = `mouse: ${s.e.which}, clicked idx: ${s.idx}, during: ${s.dur} ms`;
             console.log(s);
 
             // 显示按钮、滑动条、输入框
@@ -131,7 +131,7 @@
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick([btn]);
-            logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
+            jspsych.logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
             console.log(s);
 
             jspsych.fillText({content:'<h1>DEMO 结束</h1>', x: 100, y: 100 });
