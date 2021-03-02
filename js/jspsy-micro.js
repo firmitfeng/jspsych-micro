@@ -1,3 +1,48 @@
+let debuger = {
+    create: function () {
+        this.debugDiv = document.createElement('div');
+        this.debugDiv.id = 'debug';
+        // this.debugDiv.classList.add('debug');
+        document.body.appendChild(this.debugDiv);
+        return this;
+    },
+
+    dispInfo: function (info, ts = performance.now()) {
+        this.debugDiv.innerText = `${ts}: ${info}\n` + this.debugDiv.innerText;
+    },
+}
+
+
+const debuger_handler = {
+    get(target, propKey) {
+        if (propKey[0] === '_') {
+            throw new Error(`Invalid attempt to get private "${key}" property`);
+        } if (propKey in target) {
+            return target[propKey];
+        } else {
+            throw new ReferenceError("Prop name \"" + propKey + "\" does not exist.");
+        }
+    },
+    set(target, propKey, value) {
+        if (propKey[0] === '_') {
+            throw new Error(`Invalid attempt to set private "${key}" property`);
+        } else if (propKey === 'log') {
+            let ts = performance.now();
+            let info = `${ts}: ${value}`
+            target._logs.push(info);
+            console.log(info);
+            console.log()
+            if (!('debugDiv' in target) || isEmptyObj(target['debugDiv'])) {
+                target.debugDiv = debuger.create();
+            }
+            target.debugDiv.dispInfo(info);
+        } else {
+            target[propKey] = value;
+        }
+    }
+};
+
+
 var debug_cfg = {
     bgColor: 'rgb(200,200,200)',
     elemID: 'exp',
@@ -6,79 +51,8 @@ var debug_cfg = {
         height: '600px',
         border: '1px solid #000',
     },
-    loglv: 0,   // LogLevel.none,
     debug: true,
-};
-
-let debuger = {
-    init: function () {
-        this.debugDiv = this.createDebugDiv();
-    },
-
-    createDebugDiv: function () {
-        let deDiv = document.createElement('div');
-        deDiv.id = 'debug';
-        // deDiv.classList.add('debug');
-        document.body.appendChild(deDiv);
-        return deDiv;
-    },
-
-    dispInfo: function (info, ts = performance.now()) {
-        this.debugDiv.innerText = `${ts}: ${info}\n` + this.debugDiv.innerText;
-    },
-}
-
-const LogLevel = {
-    none: 0,
-    console: 0x1,
-    file: 0x2,
-    div: 0x4,
-    other: 0x8
-};
-
-var logger = {
-
-    logs: [],
-
-    init: function (lv = 0) {
-        this.level = lv;
-        if (this.level & LogLevel.div) {
-            debuger.init();
-        }
-        return this;
-    },
-
-    set log(log) {
-        let ts = performance.now();
-        this.logs.push(`${ts}: ${log}`);
-        if (this.level & LogLevel.console) {
-            console.log(`${ts}: ${log}`);
-        }
-        if (this.level & LogLevel.div) {
-            debuger.dispInfo(log, ts);
-        }
-        if (this.level & LogLevel.file) {
-            //write to log file
-        }
-        if (this.level & LogLevel.other) {
-            //do sth...
-        }
-    },
-
-    get log() {
-        return this.logs;
-    },
-
-    // getlog(idx){
-    //     idx = parseInt(idx);
-    //     if(!this.logs){
-    //         return [];
-    //     }
-    //     if(!idx || idx<0 || idx >= this.logs.length){
-    //         return false;
-    //     }
-    //     return this.logs[idx];
-    // },
+    debuger_handler: debuger_handler
 };
 
 
@@ -92,6 +66,25 @@ var jspsych = {
 
     kb_press: false,
 
+    _logger: {
+        _logs: [],
+        debugDiv: {},
+
+        set log(log) {
+            let ts = performance.now();
+            this.logs.push(`${ts}: ${log}`);
+            console.log(`${ts}: ${log}`);
+        },
+
+        get log() {
+            return this._logs.length === 0 ? false : this._logs[this._logs.length - 1];
+        },
+
+        get logs() {
+            return this._logs;
+        }
+    },
+
     // 返回最后添加的实验条目
     get lastDOM() {
         if (this.expItemDOMs.length > 0) {
@@ -104,16 +97,17 @@ var jspsych = {
     init: function ({ bgColor = 'rgb(200,200,200)',
         elemID = 'exp',
         elemStyle = { width: '800px', height: '600px', border: '1px solid #000', },
-        loglv = LogLevel.none,
-        debug = false, } = {}) {
+        debug = false,
+        debuger_handler = {}} = {}) {
 
         if (debug) {
-            loglv = loglv | LogLevel.div;
+            this.logger = new Proxy(this._logger, debuger_handler);
+        }else{
+            this.logger = this._logger;
         }
 
-        logger.init(loglv);
 
-        logger.log = 'init starting...';
+        this.logger.log = 'init starting...';
         document.body.style.backgroundColor = bgColor;
         this.expRootElem = document.getElementById(elemID);
         for (let k in elemStyle) {
@@ -127,11 +121,11 @@ var jspsych = {
         }
 
         this.currShowedElemID = 0;
-        logger.log = ('init completed.');
+        this.logger.log = ('init completed.');
     },
 
     waitMiSec: function (ms = 0) {
-        logger.log = (`wait ${ms} ms`);
+        this.logger.log = (`wait ${ms} ms`);
         // let ts = performance.now();
         return new Promise(resolve => {
             setTimeout((ts) => {
@@ -141,7 +135,7 @@ var jspsych = {
     },
 
     waitKB: function () {
-        logger.log = (`wait key press...`);
+        this.logger.log = (`wait key press...`);
         let ts = performance.now();
         return new Promise(resolve => {
             window.addEventListener(
@@ -155,7 +149,7 @@ var jspsych = {
     },
 
     waitClick: function (objs = false) {
-        logger.log = (`wait click`);
+        this.logger.log = (`wait click`);
         let ts = performance.now();
         if (!objs) {
             return new Promise(resolve => {
@@ -182,14 +176,14 @@ var jspsych = {
     },
 
     waitKBMiSec: function (ms = 0) {
-        logger.log = (`wait key press and ${ms} ms`);
+        this.logger.log = (`wait key press and ${ms} ms`);
         let ms_p = this.waitMiSec(ms);
         let kb_p = this.waitKB()
         return Promise.race([ms_p, kb_p])
     },
 
     waitKBMiSecsA: function (ms = 0) {
-        logger.log = (`wait key press and ${ms} ms`);
+        this.logger.log = (`wait key press and ${ms} ms`);
         let ms_p = this.waitMiSec(ms);
         let kb_p = this.waitKB()
         return Promise.all([ms_p, kb_p])
@@ -199,17 +193,17 @@ var jspsych = {
         let self = this;
         return new Promise((resolve) => {
             // setTimeout(() => {
-                [self.showIdx, self.hideIdx] = [self.hideIdx, self.showIdx];
-                // move hide and show to render 
-                // self.expElems[self.hideIdx].style.display = 'none';
-                // self.expElems[self.showIdx].style.display = 'block';
+            [self.showIdx, self.hideIdx] = [self.hideIdx, self.showIdx];
+            // move hide and show to render 
+            // self.expElems[self.hideIdx].style.display = 'none';
+            // self.expElems[self.showIdx].style.display = 'block';
 
-                if (cls) {
-                    self.cleanScreen(self.hideIdx);
-                }
-                // logger.log = (`flip to ${self.showIdx}`);
-                self.hasChange = true;
-                resolve();
+            if (cls) {
+                self.cleanScreen(self.hideIdx);
+            }
+            // this.logger.log = (`flip to ${self.showIdx}`);
+            self.hasChange = true;
+            resolve();
             // }, 0);
         });
     },
@@ -218,9 +212,11 @@ var jspsych = {
         let self = this;
         return new Promise((resolve) => {
             // setTimeout(()=>{}, 0) 运行速度比 requestAnimationFrame 快
+            // 刷新率60Hz时，每16.67 大约运行2次
+
             // setTimeout(() => {
             //     if (self.hasChange) {
-            //         logger.log = (`render screen ${self.showIdx}`);
+            //         // this.logger.log = (`render screen ${self.showIdx}`);
             //         self.expElems[self.hideIdx].style.display = 'none';
             //         self.expElems[self.showIdx].style.display = 'block';
             //         self.hasChange = false;
@@ -229,7 +225,7 @@ var jspsych = {
             // }, 0);
 
             if (self.hasChange) {
-                // logger.log = (`render screen ${self.showIdx}`);
+                // this.logger.log = (`render screen ${self.showIdx}`);
                 self.expElems[self.hideIdx].style.display = 'none';
                 self.expElems[self.showIdx].style.display = 'block';
                 self.hasChange = false;
@@ -238,7 +234,7 @@ var jspsych = {
         });
     },
 
-    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_ = [] } = {}, use_curr_elm=false) {
+    fillText: function ({ content = 'this is a text', x = 0, y = 0, w = -1, h = -1, wrapper = 'div', styles = {}, class_ = [] } = {}, use_curr_elm = false) {
         let textObj = this.createDOMObj(wrapper, x, y, w, h, styles);
         this.expItemDOMs.push(textObj);
         textObj.innerHTML = content;
@@ -275,8 +271,8 @@ var jspsych = {
     fillInput: function ({ tp = 'text', x = 0, y = 0, w = 100, h = 20, attrs = {}, styles = {}, class_ = [] } = {}) {
         let inputObj = this.createDOMObj('input', x, y, w, h, styles);
         inputObj.type = tp;
-        for (let k in attrs) {
-            inputObj[k] = attrs[k];
+        for (let prop of Object.keys(attrs)) {
+            inputObj.setAttribute(prop, attrs[prop]);
         }
         this.expItemDOMs.push(inputObj);
         for (let cl of class_) {
@@ -286,8 +282,8 @@ var jspsych = {
         return inputObj;
     },
 
-    fillRange: function ({ val=5, min = 1, max = 9, step = 'any', x = 0, y = 0, w = 100, h = 20, styles = {}, class_ = [] } = {}) {
-        let attrs = { value:val, min: min, max: max, step: step };
+    fillRange: function ({ val = 5, min = 1, max = 9, step = 'any', x = 0, y = 0, w = 100, h = 20, styles = {}, class_ = [] } = {}) {
+        let attrs = { value: val, min: min, max: max, step: step };
         let rangeObj = this.fillInput({ tp: 'range', x: x, y: y, w: w, h: h, attrs: attrs, styles: styles, class_: class_ });
         return rangeObj;
     },
@@ -355,11 +351,11 @@ var jspsych = {
         this.hasChange = true;
     },
 
-    moveObj: function(obj, {x=false, y=false} = {}){
-        if(x!==false){
+    moveObj: function (obj, { x = false, y = false } = {}) {
+        if (x !== false) {
             obj.style.left = x + 'px';
         }
-        if(y!==false){
+        if (y !== false) {
             obj.style.top = y + 'px';
         }
         this.hasChange = true;
@@ -379,7 +375,7 @@ var jspsych = {
         } else if (clsIdx < 0 || clsIdx >= this.expElems.length) {
             clsIdx = this.showIdx;
         }
-        logger.log = (`clear screen ${clsIdx}`);
+        this.logger.log = (`clear screen ${clsIdx}`);
         this.removeAllChild(this.expElems[clsIdx]);
         this.hasChange = true;
     },
@@ -394,9 +390,9 @@ var jspsych = {
     },
 
     addItemToDOM: function (obj, use_curr_elm = false) {
-        if(!use_curr_elm){
+        if (!use_curr_elm) {
             this.expElems[this.hideIdx].appendChild(obj);
-        }else{
+        } else {
             this.expElems[this.showIdx].appendChild(obj);
         }
         this.hasChange = true;
