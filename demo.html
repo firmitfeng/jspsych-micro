@@ -107,7 +107,7 @@
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick();
-            jspsych.logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
+            jspsych.logger.log = `mouse: ${s.e.which} clicked, during: ${s.dur} ms`;
             console.log(s);
 
             jspsych.fillText({content:'<h1>DEMO</h1><p>鼠标点击不同选项</p>', x: 100, y: 100 });
@@ -119,7 +119,7 @@
             await jspsych.flip();
             await jspsych.render();
             s = await jspsych.waitClick(line_arr);
-            jspsych.logger.log = `mouse: ${s.e.which}, clicked idx: ${s.idx}, during: ${s.dur} ms`;
+            jspsych.logger.log = `mouse: ${s.e.which} clicked, idx: ${s.idx}, during: ${s.dur} ms`;
             console.log(s);
 
             // 显示按钮、滑动条、输入框
@@ -133,6 +133,23 @@
             s = await jspsych.waitClick([btn]);
             jspsych.logger.log = `mouse: ${s.e.which}, during: ${s.dur} ms`;
             console.log(s);
+
+            // 测试声音
+            jspsych.fillText({content:'<h1>DEMO</h1><p>播放声音</p>', x: 100, y: 100 });
+            await jspsych.flip();
+            await jspsych.render();
+            jspsych.getAudio();
+            jspsych.audio.play();
+            await jspsych.waitMiSec(1000);
+            jspsych.audio.stop();
+            await jspsych.waitMiSec(500);
+            jspsych.getAudio({freq:800});
+            jspsych.audio.play();
+            await jspsych.waitMiSec(1000);
+            jspsych.audio.stop();
+            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
+            await jspsych.waitKB(); 
+
 
             jspsych.fillText({content:'<h1>DEMO 结束</h1>', x: 100, y: 100 });
             await jspsych.flip();

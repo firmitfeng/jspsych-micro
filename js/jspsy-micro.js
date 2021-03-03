@@ -28,10 +28,9 @@ const debuger_handler = {
             throw new Error(`Invalid attempt to set private "${key}" property`);
         } else if (propKey === 'log') {
             let ts = performance.now();
-            let info = `${ts}: ${value}`
+            let info = `${value}`
             target._logs.push(info);
             console.log(info);
-            console.log()
             if (!('debugDiv' in target) || isEmptyObj(target['debugDiv'])) {
                 target.debugDiv = debuger.create();
             }
@@ -66,6 +65,59 @@ var jspsych = {
 
     kb_press: false,
 
+    _audio: {        // 声音播放
+
+        // 参考：https://cloud.tencent.com/developer/ask/65582
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/AudioNode
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/OscillatorNode/OscillatorNode
+
+        _audioCtx: {},
+        _osc: {},
+
+        init: function({freq = 440, gain = 0.5, oscType = 'sine' } = {}){
+            if(isEmptyObj(this._audioCtx)){
+                this._audioCtx = this.createAudioCtx();
+            }
+
+            this.initOscillator({freq:freq, gain:gain, oscType:oscType});
+
+            return this;
+        },
+
+        createAudioCtx: function () {
+            // this.logger.log = (`get AudioContext...`);
+            return new (window.AudioContext || window.webkitAudioContext)();
+        },
+
+        initOscillator: function({freq, gain, oscType}){
+            this._osc = this._audioCtx.createOscillator();  // instantiate an oscillator
+            this._osc.type = oscType; // this is the default - also square, sawtooth, triangle
+            this._osc.frequency.value = freq; // Hz
+            this._osc.connect(this._audioCtx.destination); // connect it to the destination
+            this.setVol(gain);
+        },
+
+        setVol: function(gain){
+            let vol= this._audioCtx.createGain();       // 调整音量
+            // from 0 to 1, 1 full volume, 0 is muted
+            vol.gain.value = gain;
+            this._osc.connect(vol)
+        },
+
+        play: function(delay=0){
+            this._osc.start(delay);
+        },
+
+        stop: function(delay=0){
+            this._osc.stop(delay);
+        },
+
+        close: function(){
+            this._audioCtx.close();
+        }
+    },
+
     _logger: {
         _logs: [],
         debugDiv: {},
@@ -98,14 +150,13 @@ var jspsych = {
         elemID = 'exp',
         elemStyle = { width: '800px', height: '600px', border: '1px solid #000', },
         debug = false,
-        debuger_handler = {}} = {}) {
+        debuger_handler = {} } = {}) {
 
         if (debug) {
             this.logger = new Proxy(this._logger, debuger_handler);
-        }else{
+        } else {
             this.logger = this._logger;
         }
-
 
         this.logger.log = 'init starting...';
         document.body.style.backgroundColor = bgColor;
@@ -145,7 +196,6 @@ var jspsych = {
                 },
                 { once: true });
         });
-
     },
 
     waitClick: function (objs = false) {
@@ -213,6 +263,7 @@ var jspsych = {
         return new Promise((resolve) => {
             // setTimeout(()=>{}, 0) 运行速度比 requestAnimationFrame 快
             // 刷新率60Hz时，每16.67 大约运行2次
+            // 通过chrome开发者工具查看，使用 setTimeout 会出现丢帧
 
             // setTimeout(() => {
             //     if (self.hasChange) {
@@ -306,24 +357,9 @@ var jspsych = {
         return rectObj;
     },
 
-    playSound: function ({ start = 0, during = 1, freq = 440, gain = 0.5, oscType = 'sine' } = {}) {
-        // 参考：https://cloud.tencent.com/developer/ask/65582
-        let context = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = context.createOscillator();  // instantiate an oscillator
-
-        osc.type = oscType; // this is the default - also square, sawtooth, triangle
-        osc.frequency.value = freq; // Hz
-
-        // 调整音量
-        let vol = context.createGain();
-        // from 0 to 1, 1 full volume, 0 is muted
-        vol.gain.value = gain;
-
-        osc.connect(vol); // connect osc to vol
-        osc.connect(context.destination); // connect it to the destination
-
-        osc.start(context.currentTime + start); // start the oscillator
-        osc.stop(context.currentTime + during); // stop seconds after the current time
+    getAudio: function ({freq = 440, gain = 0.5, oscType = 'sine' } = {}) {
+        this.logger.log = (`play sounds...`);
+        this.audio = this._audio.init({freq:freq, gain:gain, oscType:oscType});
     },
 
     putObjToCenter: function (obj) {
