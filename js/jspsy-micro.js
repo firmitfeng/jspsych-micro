@@ -478,15 +478,37 @@ async function waitKBAndMs(ms = 0, key_codes = ['Space', 'Enter']) {
     let ts = performance.now();
     let dur = 1;
     let kb = await jspsych.waitKBMiSec(ms);
-    while (kb.e && !key_codes.includes(kb.e.code) && (dur += kb.dur) < ms) {
-        kb = await jspsych.waitKBMiSec(ms - dur);
-    }
-    if (kb.e && !key_codes.includes(kb.e.code)) {
-        kb.e = false;
-    }
-    return { e: kb.e, s: ts, dur: performance.now() - ts }
-}
 
+    // 20211101 fix old edge has no code
+    if(kb.e.code !== undefined){
+        while (kb.e && !key_codes.includes(kb.e.code) && (dur += kb.dur) < ms) {
+            kb = await jspsych.waitKBMiSec(ms - dur);
+        }
+        if (kb.e && !key_codes.includes(kb.e.code)) {
+            kb.e = false;
+        }
+        return { e: kb.e, s: ts, dur: performance.now() - ts }
+    }else{
+        let kp_arr = [];
+        for(let i=0; i<key_codes.length; i++){
+            kp_arr.push(key_codes[i].replace('Key', '').toLowerCase());
+            kp_arr.push(key_codes[i].replace('Key', '').toUpperCase());
+        }
+        while(kb.e && !kp_arr.includes(kb.e.key) && (dur += kb.dur)<ms){
+            kb = await jspsycho.waitKBMiSec(ms-dur);
+        }
+        dur += kb.dur;
+        if(kb.e && !kp_arr.includes(kb.e.key)){
+            kb.e = false;
+        }else{
+            if(kb.e.key){
+                kb.e.code = 'Key'+kb.e.key.toUpperCase();
+            }
+        }
+        
+        return { e: kb.e, s: ts, dur: dur, dur2: performance.now()-ts}
+    }
+}
 
 ///////////////////////////////////////////////////////////////
 // 判断按键是否符合

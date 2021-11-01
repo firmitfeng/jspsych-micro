@@ -131,19 +131,38 @@ function exitFullScreen() {
 
 // 工具函数，结果下载
 function download(filename, text) {
-	let pom = document.createElement('a');
-	pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-	pom.setAttribute('download', filename);
-
-	if (document.createEvent) {
-		let event = document.createEvent('MouseEvents');
-		event.initEvent('click', true, true);
-		pom.dispatchEvent(event);
-	}
-	else {
-		pom.click();
+	if(navigator.userAgent.indexOf("Edge") > -1){	// Edge
+		const _utf = '\uFEFF'; // 为了使文件以utf-8的编码模式，同时也是解决中文乱码的问题
+		const blob = new Blob([_utf + text], {
+			type: 'text/json' // 自己需要的数据格式
+		});
+		navigator.msSaveBlob(blob, filename); 
+	}else{
+		let pom = document.createElement('a');
+		pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		pom.setAttribute('download', filename);
+	
+		if (document.createEvent) {
+			let event = document.createEvent('MouseEvents');
+			event.initEvent('click', true, true);
+			pom.dispatchEvent(event);
+		}
+		else {
+			pom.click();
+		}	
 	}
 };
+
+// 隐藏显示鼠标指针
+function toggleMouse(hide=false){
+	if(hide){
+		// 显示指针
+		document.body.style.cursor = "default";
+	}else{
+		// 隐藏鼠标指针
+		document.body.style.cursor = "none";
+	}
+}
 
 // 下面的例子则是利用get拦截，实现一个生成各种 DOM 节点的通用函数dom。
 // https://es6.ruanyifeng.com/#docs/proxy

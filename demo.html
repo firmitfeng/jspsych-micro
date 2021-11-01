@@ -140,13 +140,17 @@
             await jspsych.render();
             jspsych.getAudio();
             jspsych.audio.play();
+            jspsych.logger.log = `play sound start....`;
             await jspsych.waitMiSec(1000);
             jspsych.audio.stop();
+            jspsych.logger.log = `play sound end....`;
             await jspsych.waitMiSec(500);
             jspsych.getAudio({freq:800});
+            jspsych.logger.log = `play sound start....`;
             jspsych.audio.play();
             await jspsych.waitMiSec(1000);
             jspsych.audio.stop();
+            jspsych.logger.log = `play sound end....`;
             jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
             await jspsych.waitKB(); 
 
