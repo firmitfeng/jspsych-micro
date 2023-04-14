@@ -270,16 +270,7 @@ var jspsych = {
     },
 
     waitKB: function () {
-        this.logger.log = (`wait key press...`);
-        let ts = performance.now();
-        return new Promise(resolve => {
-            window.addEventListener(
-                'keypress',
-                (ev) => {
-                    resolve({ e: ev, s: ts, dur: (performance.now() - ts) });
-                },
-                { once: true });
-        });
+        return this.waitKb();
     },
 
     waitClick: function (objs = false) {
