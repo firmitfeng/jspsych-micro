@@ -54,6 +54,54 @@ var debug_cfg = {
     debuger_handler: debuger_handler
 };
 
+const keyboard = function (value) {
+    let key = {};
+    key.value = value;
+    key.isDown = false;
+    key.isUp = true;
+    key.press = undefined;
+    key.release = undefined;
+    //The `downHandler`
+    key.downHandler = event => {
+      if (event.key === key.value) {
+        if (key.isUp && key.press) key.press(event);
+        key.isDown = true;
+        key.isUp = false;
+        event.preventDefault();
+      }
+    };
+  
+    //The `upHandler`
+    key.upHandler = event => {
+      if (event.key === key.value) {
+        if (key.isDown && key.release) key.release(event);
+        key.isDown = false;
+        key.isUp = true;
+        event.preventDefault();
+      }
+    };
+  
+    //Attach event listeners
+    const downListener = key.downHandler.bind(key);
+    const upListener = key.upHandler.bind(key);
+  
+    window.addEventListener(
+      "keydown", downListener, false
+    );
+    window.addEventListener(
+      "keyup", upListener, false
+    );
+  
+    // Detach event listeners
+    key.unsubscribe = () => {
+      window.removeEventListener("keydown", downListener);
+      window.removeEventListener("keyup", upListener);
+    };
+  
+    return key;
+  }
+  
+
 
 var jspsych = {
     expRootElem: {},    // 实验的根容器
@@ -185,6 +233,42 @@ var jspsych = {
         });
     },
 
+    waitKb: function(kbvs=[]){
+        this.logger.log = (`wait key: ${kbvs} press...`);
+        let ts = performance.now();
+
+        if(kbvs.length != 0){
+            let kbs =  kbvs.map(function (kbv, idx) {
+                return keyboard(kbv);
+            });
+            let promiseAll = [];
+            for(let i=0; i<kbvs.length; i++){
+                let p = new Promise(function (resolve, reject) {
+                    kbs[i].press = e => {
+                        kbs.map((kb, idx)=>{
+                            kb.unsubscribe();
+                        });
+
+                        resolve({ e: e, s: ts, dur: (performance.now() - ts), idx: i });
+                    }
+                });
+                promiseAll.push(p);
+            }
+
+            return Promise.race(promiseAll);
+        }else{
+            return new Promise(resolve => {
+                window.addEventListener(
+                    'keypress',
+                    (ev) => {
+                        resolve({ e: ev, s: ts, dur: (performance.now() - ts) });
+                    },
+                    { once: true });
+            });
+        }
+
+    },
+
     waitKB: function () {
         this.logger.log = (`wait key press...`);
         let ts = performance.now();
@@ -225,10 +309,10 @@ var jspsych = {
         }
     },
 
-    waitKBMiSec: function (ms = 0) {
+    waitKBMiSec: function (ms=0, kbs=[]) {
         this.logger.log = (`wait key press and ${ms} ms`);
         let ms_p = this.waitMiSec(ms);
-        let kb_p = this.waitKB()
+        let kb_p = this.waitKB(kbs)
         return Promise.race([ms_p, kb_p])
     },
 

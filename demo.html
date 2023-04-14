@@ -67,8 +67,8 @@
                 jspsych.rotateObj(r_cross, i + 1);
                 await jspsych.render();
             }
-            jspsych.fillText({ content: 'press any key to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
-            await jspsych.waitKB(); 
+            jspsych.fillText({ content: 'press any A to continue...', x: 100, y: 550, w: 600, h: 50, class_:['center-box'] }, true);
+            await jspsych.waitKb(["A", "a"]); 
             
             jspsych.fillText({content:'<h1>DEMO</h1><p>显示图片运动</p>', x: 100, y: 100 });
             let m_cross = jspsych.fillImg({ url: 'imgs/cross.jpg', x: 300, y: 200 });
@@ -95,10 +95,10 @@
             console.log(kb);
 
             // 计时相关
-            jspsych.fillText({content:'<h1>DEMO</h1><p>等待按键或2秒后继续</p>', x: 100, y: 100 });
+            jspsych.fillText({content:'<h1>DEMO</h1><p>等待按键(A)或2秒后继续</p>', x: 100, y: 100 });
             await jspsych.flip();
             await jspsych.render();
-            kb = await jspsych.waitKBMiSec(2000);
+            kb = await jspsych.waitKBMiSec(2000, ["A","a"]);
             jspsych.logger.log = `press: ${kb.e?kb.e.code:'None'}, during: ${kb.dur} ms`;
             console.log(kb);
 
